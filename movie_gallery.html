@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Collection Gallery</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-bg: #121212;
+            --card-bg: #1e1e1e;
+            --card-hover: #2a2a2a;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --accent: #e50914;
+            --accent-hover: #f40612;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--primary-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding-bottom: 50px;
+        }
+
+        header {
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.5) 60%, rgba(0, 0, 0, 0) 100%),
+                url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-position: center;
+            padding: 80px 20px;
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        }
+
+        header p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .search-bar {
+            display: flex;
+            margin: 0 auto 30px;
+            max-width: 600px;
+            position: relative;
+        }
+
+        .search-bar input {
+            flex: 1;
+            padding: 12px 50px 12px 20px;
+            border: none;
+            border-radius: 30px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            background-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 10px rgba(229, 9, 20, 0.5);
+        }
+
+        .search-bar i {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        .filter-options {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .filter-btn {
+            padding: 8px 15px;
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--text-secondary);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .filter-btn.active,
+        .filter-btn:hover {
+            background-color: var(--accent);
+            color: var(--text-primary);
+            border-color: var(--accent);
+        }
+
+        .movies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .movie-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            height: 100%;
+            position: relative;
+        }
+
+        .movie-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .movie-poster {
+            position: relative;
+            overflow: hidden;
+            padding-bottom: 150%;
+        }
+
+        .movie-poster img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .movie-card:hover .movie-poster img {
+            transform: scale(1.05);
+        }
+
+        .play-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            width: 60px;
+            height: 60px;
+            background-color: rgba(229, 9, 20, 0.7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .play-icon i {
+            color: white;
+            font-size: 24px;
+        }
+
+        .movie-card:hover .play-icon {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+
+        .movie-info {
+            padding: 15px;
+        }
+
+        .movie-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .movie-year {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Video Player Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            overflow: auto;
+        }
+
+        .modal-content {
+            position: relative;
+            width: 90%;
+            max-width: 1000px;
+            margin: 5% auto;
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 10;
+            background-color: rgba(0, 0, 0, 0.5);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .video-container {
+            width: 100%;
+            padding-bottom: 56.25%;
+            /* 16:9 aspect ratio */
+            position: relative;
+            background-color: black;
+        }
+
+        .video-container video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .movie-details {
+            padding: 20px;
+        }
+
+        .movie-details h2 {
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
+
+        .movie-details p {
+            margin-bottom: 15px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .fadeIn {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .movies-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 15px;
+            }
+
+            header h1 {
+                font-size: 2rem;
+            }
+
+            header p {
+                font-size: 1rem;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .movies-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 10px;
+            }
+
+            .movie-title {
+                font-size: 0.9rem;
+            }
+
+            .movie-year {
+                font-size: 0.8rem;
+            }
+
+            .filter-btn {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+        }
+
+        /* Empty search results */
+        .no-results {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>My Movie Collection</h1>
+        <p>A curated selection of cinematic masterpieces.</p>
+    </header>
+
+    <div class="container">
+        <div class="search-bar">
+            <input type="text" id="search-input" placeholder="Search movies...">
+            <i class="fas fa-search"></i>
+        </div>
+
+        <div class="filter-options">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="2020s">2020s</button>
+            <button class="filter-btn" data-filter="2010s">2010s</button>
+            <button class="filter-btn" data-filter="2000s">2000s</button>
+            <button class="filter-btn" data-filter="1990s">1990s</button>
+        </div>
+
+        <div class="movies-grid" id="movies-grid">
+            <!-- Movie cards will be inserted here by JavaScript -->
+        </div>
+
+        <div class="no-results" id="no-results">
+            <h2>No movies found</h2>
+            <p>Try adjusting your search query or filters.</p>
+        </div>
+    </div>
+
+    <div id="video-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="close-modal"><i class="fas fa-times"></i></span>
+            <div class="video-container">
+                <video id="video-player" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto"
+                    data-setup='{}'>
+                    <source src="" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+            <div class="movie-details">
+                <h2 id="modal-movie-title">Movie Title</h2>
+                <p id="modal-movie-year">Year</p>
+            </div>
+        </div>
+    </div> <!-- AnimJS video player library -->
+    <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/video.js@8.5.2/dist/video.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/video.js@8.5.2/dist/video-js.min.css" rel="stylesheet">
+
+    <script>
+        // Movie data
+        const movies = [
+            {
+                title: "Bachelor",
+                year: "2021",
+                poster: "Bachelor (2021)/poster.jpg",
+                videoPath: "Bachelor (2021)/Bachelor.2021.mp4",
+                subtitles: []
+            },
+            {
+                title: "Chhaava",
+                year: "2025",
+                poster: "Chhaava (2025)/poster.jpg",
+                videoPath: "Chhaava (2025)/Chhaava.2025.mkv",
+                subtitles: []
+            },
+            {
+                title: "Crazy Stupid Love",
+                year: "2011",
+                poster: "Crazy Stupid Love (2011)/poster.jpg",
+                videoPath: "Crazy Stupid Love (2011)/Crazy Stupid Love.2011.mp4",
+                subtitles: ["Crazy Stupid Love (2011)/Crazy Stupid Love.2011.srt"]
+            },
+            {
+                title: "Demolition Man",
+                year: "1993",
+                poster: "Demolition Man (1993)/poster.jpg",
+                videoPath: "Demolition Man (1993)/Demolition Man.1993.mp4",
+                subtitles: []
+            },
+            {
+                title: "Eagle Eye",
+                year: "2008",
+                poster: "Eagle Eye (2008)/poster.jpg",
+                videoPath: "Eagle Eye (2008)/Eagle Eye.2008.mp4",
+                subtitles: []
+            },
+            {
+                title: "Green Book",
+                year: "2018",
+                poster: "Green Book (2018)/poster.jpg",
+                videoPath: "Green Book (2018)/Green Book.2018.mp4",
+                subtitles: []
+            },
+            {
+                title: "Interstate 60",
+                year: "2002",
+                poster: "Interstate 60 (2002)/poster.jpg",
+                videoPath: "Interstate 60 (2002)/Interstate.60.2002.mp4",
+                subtitles: []
+            },
+            {
+                title: "It Could Happen To You",
+                year: "1994",
+                poster: "It Could Happen To You (1994)/poster.jpg",
+                videoPath: "It Could Happen To You (1994)/It Could Happen To You.1994.mp4",
+                subtitles: ["It Could Happen To You (1994)/Subs/7_English.srt"]
+            },
+            {
+                title: "Last Breath",
+                year: "2025",
+                poster: "Last Breath (2025)/poster.jpg",
+                videoPath: "Last Breath (2025)/Last Breath.2025.mp4",
+                subtitles: [
+                    "Last Breath (2025)/Last Breath.2025.srt",
+                    "Last Breath (2025)/Subs/English.srt",
+                    "Last Breath (2025)/Subs/SDH.eng.HI.srt"
+                ]
+            },
+            {
+                title: "Lord of War",
+                year: "2005",
+                poster: "Lord of War (2005)/poster.jpg",
+                videoPath: "Lord of War (2005)/Lord of War.2005.mp4",
+                subtitles: ["Lord of War (2005)/Lord of War.2005.srt"]
+            },
+            {
+                title: "Lucy",
+                year: "2014",
+                poster: "Lucy (2014)/poster.jpg",
+                videoPath: "Lucy (2014)/Lucy.2014.mp4",
+                subtitles: []
+            },
+            {
+                title: "Me Myself And Irene",
+                year: "2000",
+                poster: "Me Myself And Irene (2000)/poster.jpg",
+                videoPath: "Me Myself And Irene (2000)/Me Myself And Irene.2000.mp4",
+                subtitles: ["Me Myself And Irene (2000)/Me Myself And Irene.2000.srt"]
+            },
+            {
+                title: "Next",
+                year: "2007",
+                poster: "Next (2007)/poster.jpg",
+                videoPath: "Next (2007)/Next.2007.mp4",
+                subtitles: ["Next (2007)/Next.2007.srt"]
+            },
+            {
+                title: "Paul",
+                year: "2011",
+                poster: "Paul (2011)/poster.jpg",
+                videoPath: "Paul (2011)/Paul.2011.mp4",
+                subtitles: []
+            },
+            {
+                title: "Phenomenon",
+                year: "1996",
+                poster: "Phenomenon (1996)/poster.jpg",
+                videoPath: "Phenomenon (1996)/Phenomenon.1996.mp4",
+                subtitles: []
+            },
+            {
+                title: "Pirates Of Silicon Valley",
+                year: "1999",
+                poster: "Pirates Of Silicon Valley (1999)/poster.jpg",
+                videoPath: "Pirates Of Silicon Valley (1999)/Pirates Of Silicon Valley.1999.mp4",
+                subtitles: ["Pirates Of Silicon Valley (1999)/Pirates Of Silicon Valley.1999.srt"]
+            },
+            {
+                title: "Sisu",
+                year: "2022",
+                poster: "Sisu (2022)/poster.jpg",
+                videoPath: "Sisu (2022)/Sisu.2022.mp4",
+                subtitles: [
+                    "Sisu (2022)/Sisu.2022.srt",
+                    "Sisu (2022)/Subs/English.srt",
+                    "Sisu (2022)/Subs/Forced.eng.srt",
+                    "Sisu (2022)/Subs/fre.srt",
+                    "Sisu (2022)/Subs/SDH.eng.HI.srt"
+                ]
+            },
+            {
+                title: "The Brutalist",
+                year: "2024",
+                poster: "The Brutalist (2024)/poster.jpg",
+                videoPath: "The Brutalist (2024)/The Brutalist.2024.mp4",
+                subtitles: ["The Brutalist (2024)/The Brutalist.2024.srt"]
+            },
+            {
+                title: "The Hangover",
+                year: "2009",
+                poster: "The Hangover (2009)/poster.jpg",
+                videoPath: "The Hangover (2009)/The.Hangover.2009.mp4",
+                subtitles: []
+            },
+            {
+                title: "The Hangover Part II",
+                year: "2011",
+                poster: "The Hangover Part II (2011)/poster.jpg",
+                videoPath: "The Hangover Part II (2011)/The.Hangover.Part.II.2011.mp4",
+                subtitles: []
+            },
+            {
+                title: "The Hangover Part III",
+                year: "2013",
+                poster: "The Hangover Part III (2013)/poster.jpg",
+                videoPath: "The Hangover Part III (2013)/The.Hangover.Part.III.2013.mp4",
+                subtitles: []
+            },
+            {
+                title: "The Pursuit Of Happyness",
+                year: "2006",
+                poster: "The Pursuit Of Happyness (2006)/poster.jpg",
+                videoPath: "The Pursuit Of Happyness (2006)/The Pursuit Of Happyness.2006.mp4",
+                subtitles: ["The Pursuit Of Happyness (2006)/The Pursuit Of Happyness.2006.srt"]
+            },
+            {
+                title: "The Secret Life Of Walter Mitty",
+                year: "2013",
+                poster: "The Secret Life Of Walter Mitty (2013)/poster.jpg",
+                videoPath: "The Secret Life Of Walter Mitty (2013)/The Secret Life Of Walter Mitty.2013.mp4",
+                subtitles: []
+            },
+            {
+                title: "What Women Want",
+                year: "2000",
+                poster: "What Women Want (2000)/poster.jpg",
+                videoPath: "What Women Want (2000)/What Women Want.2000.mp4",
+                subtitles: ["What Women Want (2000)/What Women Want.2000.srt"]
+            }
+        ];
+
+        // DOM Elements
+        const moviesGrid = document.getElementById('movies-grid');
+        const searchInput = document.getElementById('search-input');
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const videoModal = document.getElementById('video-modal');
+        const closeModal = document.getElementById('close-modal');
+        const videoPlayer = document.getElementById('video-player');
+        const modalMovieTitle = document.getElementById('modal-movie-title');
+        const modalMovieYear = document.getElementById('modal-movie-year');
+        const noResults = document.getElementById('no-results');
+
+        let player;
+
+        // Display all movies when page loads
+        window.addEventListener('DOMContentLoaded', () => {
+            displayMovies(movies);
+            // Initialize VideoJS with AnimJS integration
+            player = videojs('video-player', {
+                controls: true,
+                autoplay: false,
+                preload: 'auto',
+                fluid: true,
+                playbackRates: [0.5, 1, 1.5, 2],
+                responsive: true
+            });
+
+            // Add AnimJS animation effects
+            anime({
+                targets: '#movies-grid .movie-card',
+                scale: [0.9, 1],
+                opacity: [0, 1],
+                delay: anime.stagger(50),
+                easing: 'easeOutElastic(1, .5)'
+            });
+        });
+
+        // Function to display movies
+        function displayMovies(moviesToShow) {
+            // Clear the grid first
+            moviesGrid.innerHTML = '';
+
+            if (moviesToShow.length === 0) {
+                noResults.style.display = 'block';
+                return;
+            } else {
+                noResults.style.display = 'none';
+            }
+
+            // Loop through each movie and create a card
+            moviesToShow.forEach((movie, index) => {
+                const movieCard = document.createElement('div');
+                movieCard.className = 'movie-card';
+                movieCard.dataset.index = index;
+
+                movieCard.innerHTML = `
+                    <div class="movie-poster">
+                        <img src="${movie.poster}" alt="${movie.title}" loading="lazy">
+                        <div class="play-icon">
+                            <i class="fas fa-play"></i>
+                        </div>
+                    </div>
+                    <div class="movie-info">
+                        <h3 class="movie-title">${movie.title}</h3>
+                        <div class="movie-year">${movie.year}</div>
+                    </div>
+                `;
+
+                // Add click event to play the movie
+                movieCard.addEventListener('click', () => {
+                    openVideoPlayer(movie);
+                });
+
+                moviesGrid.appendChild(movieCard);
+            });
+        }
+
+        // Filter movies based on search input
+        searchInput.addEventListener('input', () => {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            const activeFilter = document.querySelector('.filter-btn.active').getAttribute('data-filter');
+
+            filterMovies(searchTerm, activeFilter);
+        });
+
+        // Filter buttons click event
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active class from all buttons
+                filterBtns.forEach(b => b.classList.remove('active'));
+
+                // Add active class to clicked button
+                btn.classList.add('active');
+
+                // Filter movies
+                const searchTerm = searchInput.value.toLowerCase().trim();
+                const filterValue = btn.getAttribute('data-filter');
+
+                filterMovies(searchTerm, filterValue);
+            });
+        });
+
+        // Function to filter movies
+        function filterMovies(searchTerm, decade) {
+            let filteredMovies = movies;
+
+            // Filter by decade
+            if (decade !== 'all') {
+                const decadeStart = parseInt(decade.substring(0, 4));
+                filteredMovies = filteredMovies.filter(movie => {
+                    const movieYear = parseInt(movie.year);
+                    return movieYear >= decadeStart && movieYear < decadeStart + 10;
+                });
+            }
+
+            // Filter by search term
+            if (searchTerm !== '') {
+                filteredMovies = filteredMovies.filter(movie =>
+                    movie.title.toLowerCase().includes(searchTerm) ||
+                    movie.year.includes(searchTerm)
+                );
+            }
+
+            // Display filtered movies
+            displayMovies(filteredMovies);
+        }
+
+        // Open video player
+        function openVideoPlayer(movie) {
+            // Set video source
+            videoPlayer.innerHTML = '';
+
+            // Add video source
+            const source = document.createElement('source');
+            source.src = movie.videoPath;
+            source.type = movie.videoPath.endsWith('.mp4') ? 'video/mp4' : 'video/x-matroska';
+            videoPlayer.appendChild(source);
+
+            // Add subtitles if available
+            if (movie.subtitles && movie.subtitles.length > 0) {
+                movie.subtitles.forEach((subtitle, index) => {
+                    const track = document.createElement('track');
+                    track.kind = 'captions';
+                    track.label = `English ${index + 1}`;
+                    track.srclang = 'en';
+                    track.src = subtitle;
+                    if (index === 0) track.default = true;
+                    videoPlayer.appendChild(track);
+                });
+            }
+
+            // Set movie details
+            modalMovieTitle.textContent = movie.title;
+            modalMovieYear.textContent = movie.year;
+
+            // Show modal
+            videoModal.style.display = 'block';
+
+            // Load the video
+            videoPlayer.load();
+            // Reset VideoJS player for new video
+            if (player) {
+                player.src({
+                    src: movie.videoPath,
+                    type: movie.videoPath.endsWith('.mp4') ? 'video/mp4' : 'video/x-matroska'
+                });
+
+                // Remove existing text tracks
+                while (player.textTracks().length > 0) {
+                    player.removeRemoteTextTrack(player.textTracks()[0]);
+                }
+
+                // Add subtitle tracks
+                if (movie.subtitles && movie.subtitles.length > 0) {
+                    movie.subtitles.forEach((subtitle, index) => {
+                        player.addRemoteTextTrack({
+                            kind: 'subtitles',
+                            srclang: 'en',
+                            label: `English ${index + 1}`,
+                            src: subtitle,
+                            default: index === 0
+                        }, false);
+                    });
+                }
+            }
+            // Auto play with an AnimJS entrance animation
+            setTimeout(() => {
+                anime({
+                    targets: '.video-container',
+                    translateY: [20, 0],
+                    opacity: [0, 1],
+                    easing: 'easeOutQuad',
+                    duration: 500,
+                    complete: function () {
+                        player.play();
+                    }
+                });
+            }, 300);
+        }
+        // Close modal on click
+        closeModal.addEventListener('click', () => {
+            anime({
+                targets: '.modal-content',
+                translateY: [0, 20],
+                opacity: [1, 0],
+                easing: 'easeOutQuad',
+                duration: 300,
+                complete: function () {
+                    videoModal.style.display = 'none';
+                    player.pause();
+                }
+            });
+        });
+        // Close modal when clicking outside the content
+        window.addEventListener('click', (event) => {
+            if (event.target === videoModal) {
+                anime({
+                    targets: '.modal-content',
+                    translateY: [0, 20],
+                    opacity: [1, 0],
+                    easing: 'easeOutQuad',
+                    duration: 300,
+                    complete: function () {
+                        videoModal.style.display = 'none';
+                        player.pause();
+                    }
+                });
+            }
+        });
+        // Close modal with Escape key
+        window.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && videoModal.style.display === 'block') {
+                anime({
+                    targets: '.modal-content',
+                    translateY: [0, 20],
+                    opacity: [1, 0],
+                    easing: 'easeOutQuad',
+                    duration: 300,
+                    complete: function () {
+                        videoModal.style.display = 'none';
+                        player.pause();
+                    }
+                });
+            }
+        });
+
+        // Add cool AnimJS effects for UI elements
+        document.addEventListener('DOMContentLoaded', () => {
+            // Animate header text
+            anime({
+                targets: 'header h1, header p',
+                translateY: [20, 0],
+                opacity: [0, 1],
+                easing: 'easeOutQuad',
+                duration: 800,
+                delay: anime.stagger(200)
+            });
+
+            // Animate filter buttons
+            anime({
+                targets: '.filter-btn',
+                scale: [0.8, 1],
+                opacity: [0, 1],
+                easing: 'easeOutElastic(1, .5)',
+                duration: 600,
+                delay: anime.stagger(70)
+            });
+        });
+    </script>
+</body>
+
+</html>
