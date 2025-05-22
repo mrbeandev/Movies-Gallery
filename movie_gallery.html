@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
+            /* Dark theme variables (default) */
             --primary-bg: #121212;
             --card-bg: #1e1e1e;
             --card-hover: #2a2a2a;
@@ -15,9 +16,34 @@
             --text-secondary: #b3b3b3;
             --accent: #e50914;
             --accent-hover: #f40612;
+            --header-overlay: linear-gradient(to bottom, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.5) 60%, rgba(0, 0, 0, 0) 100%);
+            --search-bg: rgba(255, 255, 255, 0.1);
+            --search-focus-bg: rgba(255, 255, 255, 0.2);
+            --modal-bg: rgba(0, 0, 0, 0.9);
+            --shadow-color: rgba(0, 0, 0, 0.3);
+            --player-controls-bg: rgba(0, 0, 0, 0.5);
+            --player-progress-bg: rgba(255, 255, 255, 0.2);
+            --player-progress-filled: var(--accent);
         }
 
-        * {
+        [data-theme="light"] {
+            /* Light theme variables */
+            --primary-bg: #f5f5f5;
+            --card-bg: #ffffff;
+            --card-hover: #f0f0f0;
+            --text-primary: #222222;
+            --text-secondary: #666666;
+            --accent: #e50914;
+            --accent-hover: #f40612;
+            --header-overlay: linear-gradient(to bottom, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.5) 60%, rgba(255, 255, 255, 0) 100%);
+            --search-bg: rgba(0, 0, 0, 0.05);
+            --search-focus-bg: rgba(0, 0, 0, 0.1);
+            --modal-bg: rgba(255, 255, 255, 0.95);
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --player-controls-bg: rgba(255, 255, 255, 0.7);
+            --player-progress-bg: rgba(0, 0, 0, 0.1);
+            --player-progress-filled: var(--accent);
+        }        * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -29,10 +55,11 @@
             color: var(--text-primary);
             min-height: 100vh;
             padding-bottom: 50px;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         header {
-            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.5) 60%, rgba(0, 0, 0, 0) 100%),
+            background: var(--header-overlay),
                 url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
             background-size: cover;
             background-position: center;
@@ -41,6 +68,34 @@
             margin-bottom: 40px;
             position: relative;
             overflow: hidden;
+            transition: background 0.3s ease;
+        }
+        
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--card-bg);
+            box-shadow: 0 2px 10px var(--shadow-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .theme-toggle i {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            transition: transform 0.5s ease;
         }
 
         header h1 {
@@ -68,14 +123,12 @@
             margin: 0 auto 30px;
             max-width: 600px;
             position: relative;
-        }
-
-        .search-bar input {
+        }        .search-bar input {
             flex: 1;
             padding: 12px 50px 12px 20px;
             border: none;
             border-radius: 30px;
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color: var(--search-bg);
             color: var(--text-primary);
             font-size: 16px;
             transition: all 0.3s ease;
@@ -83,7 +136,7 @@
 
         .search-bar input:focus {
             outline: none;
-            background-color: rgba(255, 255, 255, 0.2);
+            background-color: var(--search-focus-bg);
             box-shadow: 0 0 10px rgba(229, 9, 20, 0.5);
         }
 
@@ -125,13 +178,11 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 20px;
-        }
-
-        .movie-card {
+        }        .movie-card {
             background-color: var(--card-bg);
             border-radius: 8px;
             overflow: hidden;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
             cursor: pointer;
             height: 100%;
             position: relative;
@@ -139,7 +190,7 @@
 
         .movie-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 10px 20px var(--shadow-color);
         }
 
         .movie-poster {
@@ -204,9 +255,7 @@
         .movie-year {
             font-size: 0.9rem;
             color: var(--text-secondary);
-        }
-
-        /* Video Player Modal */
+        }        /* Custom Video Player Modal */
         .modal {
             display: none;
             position: fixed;
@@ -214,9 +263,10 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
+            background-color: var(--modal-bg);
             z-index: 1000;
-            overflow: auto;
+            overflow: hidden;
+            transition: background-color 0.3s ease;
         }
 
         .modal-content {
@@ -225,33 +275,41 @@
             max-width: 1000px;
             margin: 5% auto;
             background-color: var(--card-bg);
-            border-radius: 10px;
+            border-radius: 16px;
             overflow: hidden;
+            box-shadow: 0 10px 30px var(--shadow-color);
+            transition: background-color 0.3s ease, transform 0.5s ease;
         }
 
         .close-btn {
             position: absolute;
-            top: 10px;
-            right: 10px;
-            color: white;
+            top: 15px;
+            right: 15px;
+            color: var(--text-primary);
             font-size: 24px;
             cursor: pointer;
             z-index: 10;
-            background-color: rgba(0, 0, 0, 0.5);
+            background-color: var(--player-controls-bg);
             width: 40px;
             height: 40px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background-color: var(--accent);
+            transform: rotate(90deg);
         }
 
         .video-container {
             width: 100%;
-            padding-bottom: 56.25%;
-            /* 16:9 aspect ratio */
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
             position: relative;
-            background-color: black;
+            background-color: #000;
+            overflow: hidden;
         }
 
         .video-container video {
@@ -261,20 +319,185 @@
             width: 100%;
             height: 100%;
         }
+        
+        /* Custom video controls using anime.js */
+        .video-controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: linear-gradient(transparent, var(--player-controls-bg));
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .video-container:hover .video-controls {
+            opacity: 1;
+        }
+        
+        .play-pause-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .play-pause-btn:hover {
+            background-color: var(--accent-hover);
+            transform: scale(1.1);
+        }
+        
+        .play-pause-btn i {
+            color: #fff;
+            font-size: 16px;
+        }
+        
+        .progress-container {
+            flex: 1;
+            height: 6px;
+            background-color: var(--player-progress-bg);
+            margin: 0 20px;
+            border-radius: 3px;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: var(--player-progress-filled);
+            width: 0%;
+            border-radius: 3px;
+            position: relative;
+            transition: width 0.1s linear;
+        }
+        
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            right: -8px;
+            top: -6px;
+            width: 16px;
+            height: 16px;
+            background-color: var(--accent);
+            border-radius: 50%;
+            transform: scale(0);
+            transition: transform 0.2s ease;
+        }
+        
+        .progress-container:hover .progress-bar::after {
+            transform: scale(1);
+        }
+        
+        .time-display {
+            font-size: 14px;
+            color: #fff;
+            margin-right: 10px;
+        }
+        
+        .subtitle-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .subtitle-btn i {
+            color: var(--text-primary);
+            font-size: 16px;
+        }
+        
+        .subtitle-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .fullscreen-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .fullscreen-btn i {
+            color: var(--text-primary);
+            font-size: 16px;
+        }
+        
+        .fullscreen-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .subtitle-menu {
+            position: absolute;
+            bottom: 70px;
+            right: 120px;
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 10px;
+            display: none;
+            min-width: 150px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 5;
+        }
+        
+        .subtitle-menu ul {
+            list-style: none;
+        }
+        
+        .subtitle-menu li {
+            padding: 8px 12px;
+            cursor: pointer;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+            border-radius: 4px;
+        }
+        
+        .subtitle-menu li:hover {
+            background-color: var(--accent);
+            color: #fff;
+        }
+        
+        .subtitle-menu li.active {
+            background-color: rgba(229, 9, 20, 0.2);
+            color: var(--accent);
+        }
 
         .movie-details {
-            padding: 20px;
+            padding: 25px;
+            transition: background-color 0.3s ease;
         }
 
         .movie-details h2 {
             margin-bottom: 10px;
             font-size: 1.8rem;
+            transition: color 0.3s ease;
         }
 
         .movie-details p {
             margin-bottom: 15px;
             color: var(--text-secondary);
             line-height: 1.5;
+            transition: color 0.3s ease;
         }
 
         /* Animation */
@@ -333,13 +556,34 @@
             }
         }
 
-        /* Empty search results */
-        .no-results {
+        /* Empty search results */        .no-results {
             text-align: center;
             padding: 50px;
             font-size: 1.2rem;
             color: var(--text-secondary);
             display: none;
+        }
+        
+        /* Seek animation */
+        .seek-animation {
+            pointer-events: none;
+            border-radius: 50%;
+            background-color: rgba(229, 9, 20, 0.7);
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Video hover animations */
+        .video-container:hover .play-pause-btn {
+            transform: scale(1.1);
+        }
+        
+        /* Add some extra styling for theme transition */
+        .filter-btn, .movie-title, .movie-year, input, button {
+            transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
         }
     </style>
 </head>
@@ -372,29 +616,103 @@
             <h2>No movies found</h2>
             <p>Try adjusting your search query or filters.</p>
         </div>
+    </div>    <!-- Theme toggle button -->
+    <div class="theme-toggle" id="theme-toggle">
+        <i class="fas fa-moon"></i>
     </div>
 
     <div id="video-modal" class="modal">
         <div class="modal-content">
             <span class="close-btn" id="close-modal"><i class="fas fa-times"></i></span>
             <div class="video-container">
-                <video id="video-player" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto"
-                    data-setup='{}'>
+                <video id="video-player" preload="auto">
                     <source src="" type="video/mp4">
                     Your browser does not support the video tag.
                 </video>
+                <div class="video-controls">
+                    <div class="play-pause-btn" id="play-pause-btn">
+                        <i class="fas fa-play"></i>
+                    </div>
+                    <div class="progress-container" id="progress-container">
+                        <div class="progress-bar" id="progress-bar"></div>
+                    </div>
+                    <div class="time-display" id="time-display">00:00 / 00:00</div>
+                    <div class="subtitle-btn" id="subtitle-btn">
+                        <i class="fas fa-closed-captioning"></i>
+                    </div>
+                    <div class="fullscreen-btn" id="fullscreen-btn">
+                        <i class="fas fa-expand"></i>
+                    </div>
+                </div>
+                <div class="subtitle-menu" id="subtitle-menu">
+                    <ul id="subtitle-list">
+                        <li data-track="none">No subtitles</li>
+                    </ul>
+                </div>
             </div>
             <div class="movie-details">
                 <h2 id="modal-movie-title">Movie Title</h2>
                 <p id="modal-movie-year">Year</p>
             </div>
         </div>
-    </div> <!-- AnimJS video player library -->
-    <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/video.js@8.5.2/dist/video.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/video.js@8.5.2/dist/video-js.min.css" rel="stylesheet">
-
-    <script>
+    </div>
+    <!-- AnimJS video player library -->
+    <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>    <script>
+        // Theme management
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = themeToggle.querySelector('i');
+        const htmlElement = document.documentElement;
+        
+        // Set initial theme based on user preference
+        const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const currentTheme = localStorage.getItem('theme');
+        
+        if (currentTheme === 'light') {
+            htmlElement.setAttribute('data-theme', 'light');
+            themeIcon.classList.replace('fa-moon', 'fa-sun');
+        } else if (currentTheme === 'dark') {
+            htmlElement.setAttribute('data-theme', 'dark');
+            themeIcon.classList.replace('fa-sun', 'fa-moon');
+        } else if (prefersDarkScheme) {
+            htmlElement.setAttribute('data-theme', 'dark');
+            themeIcon.classList.replace('fa-sun', 'fa-moon');
+        }
+        
+        // Theme toggle functionality
+        themeToggle.addEventListener('click', () => {
+            let theme;
+            
+            if (htmlElement.getAttribute('data-theme') === 'light') {
+                htmlElement.setAttribute('data-theme', 'dark');
+                theme = 'dark';
+                anime({
+                    targets: themeIcon,
+                    rotate: [0, 360],
+                    scale: [1, 0.8, 1],
+                    duration: 500,
+                    easing: 'easeInOutQuad',
+                    complete: () => {
+                        themeIcon.classList.replace('fa-sun', 'fa-moon');
+                    }
+                });
+            } else {
+                htmlElement.setAttribute('data-theme', 'light');
+                theme = 'light';
+                anime({
+                    targets: themeIcon,
+                    rotate: [0, 360],
+                    scale: [1, 0.8, 1],
+                    duration: 500,
+                    easing: 'easeInOutQuad',
+                    complete: () => {
+                        themeIcon.classList.replace('fa-moon', 'fa-sun');
+                    }
+                });
+            }
+            
+            localStorage.setItem('theme', theme);
+        });
+        
         // Movie data
         const movies = [
             {
@@ -575,9 +893,7 @@
                 videoPath: "What Women Want (2000)/What Women Want.2000.mp4",
                 subtitles: ["What Women Want (2000)/What Women Want.2000.srt"]
             }
-        ];
-
-        // DOM Elements
+        ];        // DOM Elements
         const moviesGrid = document.getElementById('movies-grid');
         const searchInput = document.getElementById('search-input');
         const filterBtns = document.querySelectorAll('.filter-btn');
@@ -587,23 +903,31 @@
         const modalMovieTitle = document.getElementById('modal-movie-title');
         const modalMovieYear = document.getElementById('modal-movie-year');
         const noResults = document.getElementById('no-results');
-
-        let player;
+        
+        // Custom player controls
+        const playPauseBtn = document.getElementById('play-pause-btn');
+        const playPauseIcon = playPauseBtn.querySelector('i');
+        const progressContainer = document.getElementById('progress-container');
+        const progressBar = document.getElementById('progress-bar');
+        const timeDisplay = document.getElementById('time-display');
+        const subtitleBtn = document.getElementById('subtitle-btn');
+        const subtitleMenu = document.getElementById('subtitle-menu');
+        const subtitleList = document.getElementById('subtitle-list');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+        const fullscreenIcon = fullscreenBtn.querySelector('i');
+        
+        let isPlaying = false;
+        let isFullscreen = false;
+        let currentMovie = null;
+        let subtitleTracks = [];
+        let activeSubtitleTrack = null;
 
         // Display all movies when page loads
         window.addEventListener('DOMContentLoaded', () => {
             displayMovies(movies);
-            // Initialize VideoJS with AnimJS integration
-            player = videojs('video-player', {
-                controls: true,
-                autoplay: false,
-                preload: 'auto',
-                fluid: true,
-                playbackRates: [0.5, 1, 1.5, 2],
-                responsive: true
-            });
+            setupCustomVideoPlayer();
 
-            // Add AnimJS animation effects
+            // Add AnimJS animation effects for initial load
             anime({
                 targets: '#movies-grid .movie-card',
                 scale: [0.9, 1],
@@ -612,6 +936,84 @@
                 easing: 'easeOutElastic(1, .5)'
             });
         });
+        
+        // Setup custom video player with anime.js
+        function setupCustomVideoPlayer() {
+            // Play/Pause button
+            playPauseBtn.addEventListener('click', () => {
+                if (isPlaying) {
+                    videoPlayer.pause();
+                    playPauseIcon.classList.replace('fa-pause', 'fa-play');
+                    isPlaying = false;
+                    
+                    // Animation for pause
+                    anime({
+                        targets: playPauseBtn,
+                        scale: [1, 1.2, 1],
+                        duration: 400,
+                        easing: 'easeInOutQuad'
+                    });
+                } else {
+                    videoPlayer.play();
+                    playPauseIcon.classList.replace('fa-play', 'fa-pause');
+                    isPlaying = true;
+                    
+                    // Animation for play
+                    anime({
+                        targets: playPauseBtn,
+                        rotate: [0, 360],
+                        duration: 600,
+                        easing: 'easeInOutQuad'
+                    });
+                }
+            });
+            
+            // Progress bar
+            videoPlayer.addEventListener('timeupdate', updateProgressBar);
+            
+            progressContainer.addEventListener('click', (e) => {
+                const progressTime = (e.offsetX / progressContainer.offsetWidth) * videoPlayer.duration;
+                videoPlayer.currentTime = progressTime;
+                
+                // Animation for seek
+                anime({
+                    targets: progressBar,
+                    backgroundColor: [
+                        { value: '#ffffff', duration: 200 },
+                        { value: 'var(--player-progress-filled)', duration: 200 }
+                    ],
+                    easing: 'easeInOutQuad'
+                });
+            });
+            
+            // Fullscreen button
+            fullscreenBtn.addEventListener('click', toggleFullscreen);
+            
+            // Subtitle button
+            subtitleBtn.addEventListener('click', () => {
+                if (subtitleMenu.style.display === 'block') {
+                    subtitleMenu.style.display = 'none';
+                } else {
+                    subtitleMenu.style.display = 'block';
+                    
+                    // Animation for subtitle menu
+                    anime({
+                        targets: subtitleMenu,
+                        opacity: [0, 1],
+                        translateY: [10, 0],
+                        duration: 300,
+                        easing: 'easeOutQuad'
+                    });
+                }
+            });
+            
+            // Click outside to close subtitle menu
+            document.addEventListener('click', (e) => {
+                if (!subtitleBtn.contains(e.target) && !subtitleMenu.contains(e.target)) {
+                    subtitleMenu.style.display = 'none';
+                }
+            });
+        }
 
         // Function to display movies
         function displayMovies(moviesToShow) {
@@ -701,126 +1103,278 @@
 
             // Display filtered movies
             displayMovies(filteredMovies);
-        }
-
-        // Open video player
+        }        // Open video player
         function openVideoPlayer(movie) {
-            // Set video source
+            currentMovie = movie;
+            
+            // Clear video player
             videoPlayer.innerHTML = '';
-
+            
+            // Reset player state
+            isPlaying = false;
+            playPauseIcon.classList.replace('fa-pause', 'fa-play');
+            progressBar.style.width = '0%';
+            timeDisplay.textContent = '00:00 / 00:00';
+            
             // Add video source
             const source = document.createElement('source');
             source.src = movie.videoPath;
             source.type = movie.videoPath.endsWith('.mp4') ? 'video/mp4' : 'video/x-matroska';
             videoPlayer.appendChild(source);
-
-            // Add subtitles if available
+            
+            // Setup subtitles
+            subtitleTracks = [];
+            subtitleList.innerHTML = '<li data-track="none" class="active">No subtitles</li>';
+            activeSubtitleTrack = null;
+            
             if (movie.subtitles && movie.subtitles.length > 0) {
                 movie.subtitles.forEach((subtitle, index) => {
+                    // Create track element
                     const track = document.createElement('track');
-                    track.kind = 'captions';
-                    track.label = `English ${index + 1}`;
-                    track.srclang = 'en';
+                    track.kind = 'subtitles';
+                    
+                    // Determine subtitle label based on filename
+                    let label = `English ${index + 1}`;
+                    if (subtitle.includes('SDH') || subtitle.includes('HI')) {
+                        label = "English (SDH)";
+                    } else if (subtitle.includes('Forced')) {
+                        label = "Forced Subtitles";
+                    } else if (subtitle.includes('fre')) {
+                        label = "French";
+                    }
+                    
+                    track.label = label;
+                    track.srclang = subtitle.includes('fre') ? 'fr' : 'en';
                     track.src = subtitle;
-                    if (index === 0) track.default = true;
                     videoPlayer.appendChild(track);
+                    
+                    subtitleTracks.push({
+                        track: track,
+                        label: label
+                    });
+                    
+                    // Add to subtitle menu
+                    const menuItem = document.createElement('li');
+                    menuItem.textContent = label;
+                    menuItem.dataset.track = index;
+                    menuItem.addEventListener('click', () => {
+                        // Deactivate all subtitles
+                        for (let i = 0; i < videoPlayer.textTracks.length; i++) {
+                            videoPlayer.textTracks[i].mode = 'hidden';
+                        }
+                        
+                        // Activate selected subtitle
+                        if (menuItem.dataset.track !== 'none') {
+                            const trackIndex = parseInt(menuItem.dataset.track);
+                            videoPlayer.textTracks[trackIndex].mode = 'showing';
+                            activeSubtitleTrack = trackIndex;
+                        }
+                        
+                        // Update UI
+                        document.querySelectorAll('#subtitle-list li').forEach(li => {
+                            li.classList.remove('active');
+                        });
+                        menuItem.classList.add('active');
+                        
+                        // Hide menu
+                        subtitleMenu.style.display = 'none';
+                    });
+                    
+                    subtitleList.appendChild(menuItem);
                 });
             }
-
+            
             // Set movie details
             modalMovieTitle.textContent = movie.title;
             modalMovieYear.textContent = movie.year;
-
-            // Show modal
-            videoModal.style.display = 'block';
-
+            
             // Load the video
             videoPlayer.load();
-            // Reset VideoJS player for new video
-            if (player) {
-                player.src({
-                    src: movie.videoPath,
-                    type: movie.videoPath.endsWith('.mp4') ? 'video/mp4' : 'video/x-matroska'
-                });
-
-                // Remove existing text tracks
-                while (player.textTracks().length > 0) {
-                    player.removeRemoteTextTrack(player.textTracks()[0]);
-                }
-
-                // Add subtitle tracks
-                if (movie.subtitles && movie.subtitles.length > 0) {
-                    movie.subtitles.forEach((subtitle, index) => {
-                        player.addRemoteTextTrack({
-                            kind: 'subtitles',
-                            srclang: 'en',
-                            label: `English ${index + 1}`,
-                            src: subtitle,
-                            default: index === 0
-                        }, false);
-                    });
-                }
-            }
-            // Auto play with an AnimJS entrance animation
-            setTimeout(() => {
-                anime({
-                    targets: '.video-container',
-                    translateY: [20, 0],
-                    opacity: [0, 1],
-                    easing: 'easeOutQuad',
-                    duration: 500,
-                    complete: function () {
-                        player.play();
-                    }
-                });
-            }, 300);
-        }
-        // Close modal on click
-        closeModal.addEventListener('click', () => {
+            
+            // Show modal with animation
+            videoModal.style.display = 'block';
+            
+            // Animate modal entrance
             anime({
                 targets: '.modal-content',
-                translateY: [0, 20],
-                opacity: [1, 0],
-                easing: 'easeOutQuad',
-                duration: 300,
-                complete: function () {
-                    videoModal.style.display = 'none';
-                    player.pause();
-                }
+                translateY: [50, 0],
+                opacity: [0, 1],
+                easing: 'easeOutExpo',
+                duration: 800
             });
+            
+            // Add clickable area for play/pause on video itself
+            videoPlayer.addEventListener('click', () => {
+                playPauseBtn.click();
+            });
+        }
+        
+        // Update progress bar
+        function updateProgressBar() {
+            const percentage = (videoPlayer.currentTime / videoPlayer.duration) * 100;
+            progressBar.style.width = `${percentage}%`;
+            
+            // Format time display
+            const currentMinutes = Math.floor(videoPlayer.currentTime / 60);
+            const currentSeconds = Math.floor(videoPlayer.currentTime % 60);
+            const durationMinutes = Math.floor(videoPlayer.duration / 60);
+            const durationSeconds = Math.floor(videoPlayer.duration % 60);
+            
+            timeDisplay.textContent = `${currentMinutes.toString().padStart(2, '0')}:${currentSeconds.toString().padStart(2, '0')} / ${durationMinutes.toString().padStart(2, '0')}:${durationSeconds.toString().padStart(2, '0')}`;
+            
+            // Auto-pause when video ends
+            if (videoPlayer.ended) {
+                playPauseIcon.classList.replace('fa-pause', 'fa-play');
+                isPlaying = false;
+                
+                // Show replay animation
+                anime({
+                    targets: playPauseBtn,
+                    rotate: 360,
+                    scale: [1, 1.2, 1],
+                    duration: 800,
+                    easing: 'easeOutElastic(1, .8)'
+                });
+            }
+        }
+        
+        // Toggle fullscreen
+        function toggleFullscreen() {
+            if (!isFullscreen) {
+                if (videoModal.requestFullscreen) {
+                    videoModal.requestFullscreen();
+                } else if (videoModal.mozRequestFullScreen) {
+                    videoModal.mozRequestFullScreen();
+                } else if (videoModal.webkitRequestFullscreen) {
+                    videoModal.webkitRequestFullscreen();
+                } else if (videoModal.msRequestFullscreen) {
+                    videoModal.msRequestFullscreen();
+                }
+                
+                fullscreenIcon.classList.replace('fa-expand', 'fa-compress');
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.mozCancelFullScreen) {
+                    document.mozCancelFullScreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+                
+                fullscreenIcon.classList.replace('fa-compress', 'fa-expand');
+            }
+            
+            isFullscreen = !isFullscreen;
+            
+            // Animation for fullscreen button
+            anime({
+                targets: fullscreenBtn,
+                scale: [1, 0.8, 1],
+                duration: 300,
+                easing: 'easeInOutQuad'
+            });
+        }        // Close modal on click
+        closeModal.addEventListener('click', () => {
+            closeVideoModal();
         });
+        
         // Close modal when clicking outside the content
         window.addEventListener('click', (event) => {
             if (event.target === videoModal) {
-                anime({
-                    targets: '.modal-content',
-                    translateY: [0, 20],
-                    opacity: [1, 0],
-                    easing: 'easeOutQuad',
-                    duration: 300,
-                    complete: function () {
-                        videoModal.style.display = 'none';
-                        player.pause();
-                    }
-                });
+                closeVideoModal();
             }
         });
+        
         // Close modal with Escape key
         window.addEventListener('keydown', (event) => {
             if (event.key === 'Escape' && videoModal.style.display === 'block') {
-                anime({
-                    targets: '.modal-content',
-                    translateY: [0, 20],
-                    opacity: [1, 0],
-                    easing: 'easeOutQuad',
-                    duration: 300,
-                    complete: function () {
-                        videoModal.style.display = 'none';
-                        player.pause();
-                    }
-                });
+                closeVideoModal();
+            }
+            
+            // Space bar to play/pause
+            if (event.code === 'Space' && videoModal.style.display === 'block') {
+                event.preventDefault();
+                playPauseBtn.click();
+            }
+            
+            // Arrow keys for seeking
+            if (videoModal.style.display === 'block') {
+                if (event.key === 'ArrowRight') {
+                    videoPlayer.currentTime += 10;
+                    showSeekAnimation('forward');
+                }
+                if (event.key === 'ArrowLeft') {
+                    videoPlayer.currentTime -= 10;
+                    showSeekAnimation('backward');
+                }
             }
         });
+        
+        // Function to show seek animation
+        function showSeekAnimation(direction) {
+            const seekIcon = document.createElement('div');
+            seekIcon.className = 'seek-animation';
+            seekIcon.innerHTML = `<i class="fas fa-${direction === 'forward' ? 'forward' : 'backward'} fa-2x"></i>`;
+            seekIcon.style.position = 'absolute';
+            seekIcon.style.top = '50%';
+            seekIcon.style.left = '50%';
+            seekIcon.style.transform = 'translate(-50%, -50%)';
+            seekIcon.style.color = 'white';
+            seekIcon.style.zIndex = '100';
+            seekIcon.style.opacity = '0';
+            
+            document.querySelector('.video-container').appendChild(seekIcon);
+            
+            anime({
+                targets: seekIcon,
+                opacity: [0, 1, 0],
+                scale: [0.5, 1.5, 0.5],
+                duration: 1000,
+                easing: 'easeOutQuad',
+                complete: function() {
+                    seekIcon.remove();
+                }
+            });
+        }
+        
+        // Function to close video modal
+        function closeVideoModal() {
+            // Stop video and hide subtitles
+            videoPlayer.pause();
+            isPlaying = false;
+            
+            // Close animation
+            anime({
+                targets: '.modal-content',
+                translateY: [0, 50],
+                opacity: [1, 0],
+                easing: 'easeOutQuad',
+                duration: 300,
+                complete: function() {
+                    videoModal.style.display = 'none';
+                    
+                    // Reset player
+                    subtitleMenu.style.display = 'none';
+                    
+                    // Exit fullscreen if needed
+                    if (isFullscreen) {
+                        if (document.exitFullscreen) {
+                            document.exitFullscreen();
+                        } else if (document.mozCancelFullScreen) {
+                            document.mozCancelFullScreen();
+                        } else if (document.webkitExitFullscreen) {
+                            document.webkitExitFullscreen();
+                        } else if (document.msExitFullscreen) {
+                            document.msExitFullscreen();
+                        }
+                        isFullscreen = false;
+                        fullscreenIcon.classList.replace('fa-compress', 'fa-expand');
+                    }
+                }
+            });
+        }
 
         // Add cool AnimJS effects for UI elements
         document.addEventListener('DOMContentLoaded', () => {
@@ -842,6 +1396,16 @@
                 easing: 'easeOutElastic(1, .5)',
                 duration: 600,
                 delay: anime.stagger(70)
+            });
+            
+            // Animate theme toggle
+            anime({
+                targets: '.theme-toggle',
+                translateY: [-50, 0],
+                opacity: [0, 1],
+                duration: 800,
+                easing: 'easeOutElastic(1, .8)',
+                delay: 800
             });
         });
     </script>
